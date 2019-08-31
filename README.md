@@ -1,4 +1,4 @@
-# Contao4you rate_page Bundle
+# Contao4you reviews Bundle
 
 Mit dieser Contao Erweiterung können Kundenbewertungen mit einer 
 Sterne-Bewertung und einem Text eingeholt werden. Diese Bewertungen
@@ -15,7 +15,7 @@ Badge erneut.
 Um eine Bewertung abgeben zu können, muss der "Kunde" eingeladen werden.
 Hierbei wird ein Token generiert, womit der Kunde eine einmalige Bewertung
 abgeben kann. Die Einladung kann mit dem Formular verschickt werden
-oder automatisiert per RatePageService->sendLink(...) oder per API.
+oder automatisiert per ReviewsService->sendLink(...) oder per API.
 Siehe hierzu weiter unten.
 
 Die Bewertungen werden je Kategorie erfasst. In einer Multi-Domain
@@ -28,8 +28,8 @@ werden und können hier auch (im Backend) kommentiert werden.
 
 ## Installieren
 
-1. Im Contao-Manager nach rate_page suchen und installieren:
-2. oder auf der Konsole composer require c4y/contao-rate-page
+1. Im Contao-Manager nach c4y/reviews suchen und installieren:
+2. oder auf der Konsole composer require c4y/reviews
 
 ## Einrichtung
 
@@ -66,8 +66,8 @@ werden und können hier auch (im Backend) kommentiert werden.
 
 ## Senden per Service
 
-1. Hinzufügen des RatePageService per DI
-2. Senden einer Einladung per RatePageService->sendLink($user, $email, $kategorie)
+1. Hinzufügen des ReviewService per DI
+2. Senden einer Einladung per ReviewService->sendLink($user, $email, $kategorie)
    - der User ist im Klartext derjenige, der bei der Bewertung angezeigt
      wird
 
@@ -77,7 +77,7 @@ POST Request als JSON. Der API Token muss bei den Bewertungen in der
 jeweiligen Kategorie angelegt werden.
 
 ```
-POST /api/ratepage/sendlink
+POST /api/reviews/sendlink
 {
 	"user": "API User",
 	"email": "test@test.de",
