@@ -1,0 +1,80 @@
+<div class="reviews-badge<?php if($this->hideBadge):?> closed<?php endif?>">
+    <div class="close">X</div>
+    <?php $this->insert('picture_default', $this->badgeLogo->picture); ?>
+    <div class="title"></div>
+    <div class="reviews--number-of-reviews"><?= $this->numberOfReviews; ?> <?= $GLOBALS['TL_LANG']['reviews']['kundenbewertungen']; ?></div>
+    <div class="reviews--rating-stars">
+        <div class="reviews--rating-stars-full" style="width: <?=$this->ratingPercentage?>%;">
+            <span>&#x2605;&#x2605;&#x2605;&#x2605;&#x2605;</span>
+        </div>
+    </div>
+    <div class="reviews--rating"><span><?= $this->rating; ?></span> / 5.00</div>
+</div>
+
+<div class="reviews-list">
+    <div class="reviews-list--header row">
+        <div class="reviews-list--header-logo col-xs-3">
+            <?php $this->insert('picture_default', $this->listLogo->picture); ?>
+        </div>
+        <div class="reviews-list--header-rating col-xs-7">
+            <div class="reviews-list--header-rating-description">
+                <?=$this->reviews_list_header_description?>
+            </div>
+            <div class="reviews--rating"><span><?=$this->rating?></span> / 5.00</div>
+            <div class="reviews--rating-stars">
+                <div class="reviews--rating-stars-full" style="width: <?=$this->ratingPercentage?>%;">
+                    <span>&#x2605;&#x2605;&#x2605;&#x2605;&#x2605;</span>
+                </div>
+            </div>
+        </div>
+        <div class="reviews-list--header-close col-xs-2">
+            <button>x</button>
+        </div>
+    </div>
+    <div class="reviews-list--reviews">
+        <?php foreach($this->reviews as $review): ?>
+            <div class="reviews-list--review-wrapper">
+                <p class="reviews-list--review-author"><?= $review->user?></p>
+                <p class="reviews-list--review-time"><?= date("d.m.Y", $review->review_date); ?></p>
+                <p class="reviews-list--review">
+                    <?php for($i=1; $i<=5; $i++): ?>
+                    <?php if($review->rating >= $i): ?>
+                    <span class="reviews--star__full">&#x2605</span>
+                    <?php else: ?>
+                    <span class="reviews--star__empty">&#x2606</span>
+                    <?php endif; ?>
+                    <?php endfor;?>
+                    <span class="reviews-list--review__text"><?=$review->review ?></span>
+                </p>
+                <?php if(!empty($review->comment)): ?>
+                <p class="reviews-list--comment-header"><?= $GLOBALS['TL_LANG']['reviews']['review_comment']; ?></p>
+                <p class="reviews-list--comment">
+                    <?= $review->comment; ?>
+                </p>
+                <?php endif; ?>
+            </div>
+        <?php endforeach;?>
+    </div>
+    <div class="reviews-list--link-to-all-reviews">
+        <a href="<?= $this->jumpTo ?>">Alle Bewertungen ansehen.</a>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+        // Close Badge
+        document.querySelector(".reviews-badge .close").addEventListener('click', function(e){
+            e.stopPropagation();
+            document.querySelector(".reviews-badge").classList.add('closed');
+            document.cookie = "reviews_hide_badge=1; expires=0; path=/";
+        })
+        // Open List
+        document.querySelector(".reviews-badge").addEventListener('click', function(){
+            document.querySelector(".reviews-list").classList.add('active');
+        })
+        // Close List
+        document.querySelector(".reviews-list--header").addEventListener('click', function(){
+            document.querySelector(".reviews-list").classList.remove('active');
+        })
+    });
+</script>

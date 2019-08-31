@@ -1,0 +1,129 @@
+<?php
+
+/*
+ * This file is part of c4y/reviews.
+ *
+ * (c) Oliver Lohoff
+ *
+ * @license MIT License
+ */
+
+namespace C4Y\Reviews\Controller;
+
+use C4Y\Reviews\Services\ReviewService;
+use Contao\Input;
+use Doctrine\DBAL\Connection;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+
+class ReviewController extends AbstractController
+{
+    /**
+     * @var
+     */
+    private $reviewService;
+
+    /**
+     * @var Connection
+     */
+    private $connection;
+
+    /**
+     * ReviewController constructor.
+     *
+     * @param ReviewService $reviewService
+     */
+    public function __construct(ReviewService $reviewService, Connection $connection)
+    {
+        $this->reviewService = $reviewService;
+        $this->connection = $connection;
+    }
+
+    /**
+     * {
+     *  "user": "API User",
+     *  "email": "test@test.de",
+     *  "category": 1,
+     *  "apiToken": "ac43a85f-167c-41db-aa7b-7edb51d6a55b"
+     * }.
+     *
+     * @Route("/api/reviews/sendlink", methods={"POST"}, name="sendLink")
+     */
+    public function sendLink(Request $request)
+    {
+        $body = $request->getContent();
+        $data = json_decode($body);
+
+        if (null === $data) {
+            return new JsonResponse('{"error": true, "msg": "No valid json"}');
+        }
+
+        $statement = $this->connection->createQueryBuilder()
+            ->select('id, apiToken')
+            ->from('tl_c4y_reviews_category', 't')
+            ->where('t.id =:category')
+            ->setParameter('category', $data->category)
+            ->execute();
+
+        $result = $statement->fetch(\PDO::FETCH_OBJ);
+
+        if (false === $result) {
+            return new JsonResponse(['error' => true, 'msg' => 'Category '.$data->category.' not found']);
+        }
+
+        if ($data->apiToken !== $result->apiToken) {
+            return new JsonResponse(['error' => true, 'msg' => 'API-Token invalid']);
+        }
+
+        $result = $this->reviewService->sendLink($data->user, $data->email,$data->category);
+
+        if (false === $result || false === $result['1']) {
+            return new JsonResponse(['error' => true, 'msg' => 'E-Mail could not be send. Typo in email?']);
+        }
+
+        return new JsonResponse('{"error": false, "msg": "E-Mail has been send"}');
+    }
+
+    /**
+     * Publish a review with the API Token in the category
+     * GET /api/reviews/publish/123?apiToken=12345
+     *
+     * @Route("/api/reviews/publish/{id}", methods={"GET"}, name="publishReview")
+     */
+    public function publishReview($id, Request $request)
+    {
+        $apiToken = Input::get("apiToken");
+
+        if (empty($apiToken)) {
+            return new Response('You need a valid API Token');
+        }
+
+        $statement = $this->connection->createQueryBuilder()
+            ->select('r.id', 'c.apiToken')
+            ->from('tl_c4y_reviews_category', 'c')
+            ->leftJoin('c', 'tl_c4y_reviews', 'r', 'c.id=r.pid')
+            ->where('r.id = :id')
+            ->andWhere('c.apiToken = :apiToken')
+            ->setParameter('id', $id)
+            ->setParameter('apiToken', $apiToken)
+            ->execute();
+
+        $result = $statement->fetch(\PDO::FETCH_OBJ);
+
+        if (false === $result) {
+            return new Response('ID or API Key is invalid');
+        }
+
+        $this->connection->createQueryBuilder()
+            ->update('tl_c4y_reviews', 'r')
+            ->set("published", "1")
+            ->where("id = :id")
+            ->setParameter("id", $id)
+            ->execute();
+
+        return new Response('The Review with ID ' . $result->id . ' has been published');
+    }
+}

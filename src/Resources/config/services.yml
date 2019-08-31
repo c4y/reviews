@@ -1,0 +1,32 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: true
+
+    C4Y\Reviews\:
+        resource: '../../*'
+        exclude: '../../{Resources/contao,DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+
+    C4Y\Reviews\Controller\Module\BadgeModule:
+        tags:
+            - { name: contao.frontend_module, type: reviews_badge, category: miscellaneous }
+
+    C4Y\Reviews\Controller\Module\ReviewFormModule:
+        tags:
+            - { name: contao.frontend_module, type: reviews_form, category: miscellaneous }
+
+    C4Y\Reviews\Controller\Module\SendReviewLinkModule:
+        tags:
+            - { name: contao.frontend_module, type: reviews_sendlink, category: miscellaneous }
+
+    C4Y\Reviews\Controller\Module\ReviewListModule:
+        tags:
+            - { name: contao.frontend_module, type: reviews_list, category: miscellaneous }
+
+    C4Y\Reviews\Controller\Module\ReviewRichSnippetModule:
+        tags:
+            - { name: contao.frontend_module, type: reviews_richsnippet, category: miscellaneous }
+
+    Contao\CoreBundle\Routing\UrlGenerator: '@contao.routing.url_generator'
+    Contao\CoreBundle\Image\PictureInterface: '@contao.image.picture_factory'

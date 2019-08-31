@@ -1,0 +1,49 @@
+<script type='application/ld+json'>
+/*
+    {
+        "@context": "https://schema.org/",
+        "@type": "Product",
+        "name": "xxx",
+        "image": [
+            "xxx"
+        ],
+        "description": "xxx",
+        "brand": {
+            "@type": "Thing",
+            "name": "xxx"
+        },
+        "sku": "xxx",
+        "review": {
+            "@type": "Review",
+            "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": "<?= $this->rating; ?>",
+                "bestRating": "5"
+            },
+            "author": {
+                "@type": "Person",
+                "name": "<?= $this->user; ?>"
+            }
+        },
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "<?= $this->avgRating; ?>",
+            "bestRating": "5",
+            "ratingCount": "<?= $this->numberOfReviews; ?>"
+        },
+        "offers": {
+            "@type": "Offer",
+            "url": "xxx",
+            "priceCurrency": "EUR",
+            "price": "xxx",
+            "priceValidUntil": "2099-12-31",
+            "itemCondition": "https://schema.org/UsedCondition",
+            "availability": "https://schema.org/InStock",
+            "seller": {
+                "@type": "Organization",
+                "name": "xxx"
+            }
+        }
+    }
+*/
+</script>

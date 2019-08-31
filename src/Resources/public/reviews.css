@@ -1,0 +1,284 @@
+/******************************************
+ * General star stylings
+ ******************************************/
+.reviews--rating-stars {
+    width:150px;
+    position: relative;
+    color: #F7A720;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+}
+
+/*
+   will be set to the width, calculated by the module
+ */
+.reviews--rating-stars-full {
+    overflow:hidden;
+}
+
+.reviews--rating-stars-full span {
+    font-size:30px;
+    white-space: nowrap;
+    overflow: hidden;
+    color: #F7A720;
+    line-height: 1em;
+}
+
+/*
+   the empty stars with 100% in background
+*/
+.reviews--rating-stars-full span:before {
+    content:"\2606\2606\2606\2606\2606";
+    position: absolute;
+    color: #F7A720;
+    z-index: -1;
+}
+
+
+/******************************************
+ * General stylings
+ ******************************************/
+
+.reviews--rating {
+    text-align: center;
+}
+
+.reviews--rating span {
+    font-weight: bold;
+}
+
+.reviews--number-of-reviews {
+    font-size: 11px;
+    text-align: center;
+}
+
+
+/******************************************
+ * Badge
+ ******************************************/
+.reviews-badge {
+    width: 170px;
+    box-sizing: border-box;
+    background-color: #fff;
+    box-shadow: 0px 4px 7px -2px #000;
+    z-index: 1000;
+    font-size: 14px;
+    position: fixed!important;
+    bottom: 0;
+    right: 0px;
+    background: #eee;
+    border: 1px solid #ccc;
+    padding: 5px;
+    transition: all 1s ease-in-out;
+}
+
+.reviews-badge.closed {
+    right: -170px;
+}
+
+.reviews-badge .close {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    font-weight: bold;
+    z-index: 100;
+}
+
+.reviews-badge .close:hover {
+    cursor: pointer;
+}
+
+.reviews-badge img {
+    width: 150px;
+    height: auto;
+}
+
+.reviews-badge .title {
+    position: absolute;
+    left: 60px;
+    top: 5px;
+}
+
+.reviews-badge .rating_number {
+    color: #e7711b;
+    font-weight: bold;
+    font-size: 13px;
+    text-align: center;
+}
+
+.reviews-badge .rating-count {
+    font-size: 16px;
+}
+
+.reviews-badge .rating-count span {
+    font-weight: bold;
+}
+
+
+
+/*****************************************
+    Review - List
+******************************************/
+.reviews-list {
+    position: fixed!important;
+    right: -368px;
+    bottom: 0;
+    width: 368px;
+    box-sizing: border-box!important;
+    background-color: #fff;
+    height: 100%;
+    z-index: 1000;
+    box-shadow: 0px 0px 4px #000;
+    transition: all .7s ease-in-out;
+    padding: 0!important;
+    overflow: hidden;
+}
+
+/* Show review list wrapper*/
+.reviews-list.active {
+    right: 0;
+}
+
+/* header */
+.reviews-list--header {
+    position: relative;
+    min-height: 80px;
+    padding-bottom: 5px;
+    box-shadow: 2px -1px 4px #000;
+}
+
+.reviews-list--header:hover {
+    cursor: pointer;
+}
+
+.reviews-list--header-logo img {
+    height: 70px;
+    margin-top: 5px;
+    margin-left: 5px;
+    overflow: hidden;
+    width: auto;
+}
+
+.reviews-list--header-close button{
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    font-size: 32px;
+    background: none;
+    border: none;
+    font-weight: bold;
+    color: #999;
+    font-family: arial;
+    height: auto!important;
+    line-height: .6;
+    padding: 0;
+}
+
+.reviews-list--header-rating-description {
+    text-align: center;
+}
+
+/* reviews */
+.reviews-list--reviews {
+    max-height: calc(100% - 140px);
+    overflow-y: scroll;
+    padding: 10px;
+}
+
+
+.reviews-list--review-wrapper p {
+    text-align: left!important;
+}
+
+.reviews-list--review-author {
+    font-weight: bold;
+    margin-bottom: 0px;
+    margin-top: 20px;
+}
+
+.reviews-list--review-time {
+    color: #999;
+    margin: 0 0 -10px 0;
+}
+
+.reviews--star__full,
+.reviews--star__empty {
+    color: #F7A720;
+    letter-spacing: -5px;
+}
+
+.reviews-list--review__text {
+    padding-left: 10px;
+}
+
+.reviews-list--link-to-all-reviews {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.reviews-list--comment-header {
+    font-weight: bold;
+}
+
+.reviews-list--comment {
+    font-style: italic;
+}
+
+.mod_reviews_reviewlist .reviews-list--comment-header,
+.mod_reviews_reviewlist .reviews-list--comment {
+    margin-left: 20px;
+}
+
+/*****************************************
+    Star - Rating
+    https://github.com/fredolss/rater-js
+******************************************/
+.star-rating {
+    margin: 0;
+}
+.star-rating p.error {
+    text-align: left;
+}
+.star-rating > fieldset {
+    border: none;
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+}
+.star-rating > fieldset:not(:checked) > input {
+    position: absolute;
+    top: -9999px;
+    clip: rect(0, 0, 0, 0);
+}
+.star-rating > fieldset:not(:checked) > label {
+    float: right;
+    width: 1em;
+    padding: 0 0.05em;
+    overflow: hidden;
+    white-space: nowrap;
+    cursor: pointer;
+    font-size: 200%;
+    color: #F7A720;
+    margin: 0;
+}
+.star-rating > fieldset:not(:checked) > label:before {
+    content: "\2606";
+}
+.star-rating > fieldset:not(:checked) > label:hover, .star-rating > fieldset:not(:checked) > label:hover ~ label {
+    color: #F7A720;
+    text-shadow: 0 0 3px #F7A720;
+}
+.star-rating > fieldset:not(:checked) > label:hover:before, .star-rating > fieldset:not(:checked) > label:hover ~ label:before {
+    content: "\2605";
+}
+.star-rating > fieldset > input:checked ~ label:before {
+    content: "\2605";
+}
+.star-rating > fieldset > label:active {
+    position: relative;
+    top: 2px;
+}

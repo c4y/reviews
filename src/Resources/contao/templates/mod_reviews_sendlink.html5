@@ -1,0 +1,12 @@
+<?php $this->extend('block_searchable'); ?>
+<?php $this->block('content'); ?>
+
+<?php if(!empty($this->msg)):?>
+<p><?= $this->msg; ?></p>
+<a href="<?=$this->url; ?>"><?= $this->buttonLabel; ?></a>
+<?php endif; ?>
+
+<?php if(!empty($this->form)): ?>
+<?= $this->form; ?>
+<?php endif; ?>
+<?php $this->endblock(); ?>
