@@ -78,6 +78,7 @@ class ReviewService
         // Send notification
         $notificationTokens = [
             'recipient_email' => $recipient,
+            'user' => $user,
             'link' => $this->router->generate(
                 $alias,
                 ['token' => $token],
