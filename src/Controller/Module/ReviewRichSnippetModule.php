@@ -46,6 +46,7 @@ class ReviewRichSnippetModule extends AbstractFrontendModuleController
         $template->user = $result->user;
         $template->review = $result->review;
         $template->review_date = $review_date;
+        $template->rating = $result->rating;
 
         return $template->getResponse();
     }
