@@ -44,7 +44,7 @@
                     <span class="reviews--star__empty">&#x2606</span>
                     <?php endif; ?>
                     <?php endfor;?>
-                    <span class="reviews-list--review__text"><?=$review->review ?></span>
+                    <span class="reviews-list--review__text"><?= html_entity_decode($review->review) ?></span>
                 </p>
                 <?php if(!empty($review->comment)): ?>
                 <p class="reviews-list--comment-header"><?= $GLOBALS['TL_LANG']['reviews']['review_comment']; ?></p>
