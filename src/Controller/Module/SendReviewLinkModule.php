@@ -61,7 +61,7 @@ class SendReviewLinkModule extends AbstractFrontendModuleController
         ]);
 
         $objForm->addFormField('submit', [
-            'label' => 'Einladung verschicken',
+            'label' => $GLOBALS['TL_LANG']['reviews']['form_sendlink_submit'][0],
             'inputType' => 'submit',
         ]);
 
