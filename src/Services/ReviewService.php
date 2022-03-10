@@ -13,10 +13,8 @@ namespace C4Y\Reviews\Services;
 use C4Y\Reviews\Models\CategoryModel;
 use C4Y\Reviews\Models\TokenModel;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\Routing\UrlGenerator;
 use Contao\PageModel;
 use NotificationCenter\Model\Notification;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
 
 class ReviewService
@@ -27,7 +25,7 @@ class ReviewService
     protected $request;
 
     /**
-     * @var UrlGenerator
+     * @var RouterInterface
      */
     private $router;
 
@@ -42,11 +40,9 @@ class ReviewService
     private $contao;
 
     public function __construct(
-        UrlGenerator $router,
         TokenGeneratorInterface $tokenGenerator,
         ContaoFramework $contao
     ) {
-        $this->router = $router;
         $this->tokenGenerator = $tokenGenerator;
         $this->contao = $contao;
 
@@ -55,15 +51,16 @@ class ReviewService
     }
 
     /**
-     * @param $user
-     * @param $recipient
-     * @param $categoryId
+     * @param string $user
+     * @param string $recipient
+     * @param int $categoryId
+     * @return array|false
      */
-    public function sendLink($user, $recipient, $categoryId)
+    public function sendLink(string $user, string $recipient, int $categoryId)
     {
         // generate alias
         $categoryModel = CategoryModel::findById($categoryId);
-        $alias = PageModel::findById($categoryModel->url)->alias;
+        $url = PageModel::findById($categoryModel->url)->getAbsoluteUrl();
 
         // create and store Token
         $token = $this->tokenGenerator->generateToken();
@@ -79,11 +76,7 @@ class ReviewService
         $notificationTokens = [
             'recipient_email' => $recipient,
             'user' => $user,
-            'link' => $this->router->generate(
-                $alias,
-                ['token' => $token],
-                UrlGeneratorInterface::ABSOLUTE_URL
-            ),
+            'link' => $url . "?token=" . $token
         ];
 
         /** @var Notification $notification */

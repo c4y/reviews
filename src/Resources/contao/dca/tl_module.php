@@ -8,11 +8,17 @@
  * @license MIT License
  */
 
-$GLOBALS['TL_DCA']['tl_module']['palettes']['reviews_badge'] = '{title_legend},name,headline,type,reviews_category,reviews_list_header_description,jumpTo,reviews_badge_logo,reviews_badge_size,reviews_list_logo,reviews_list_size,reviews_badge_numberOfReviews,customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
-$GLOBALS['TL_DCA']['tl_module']['palettes']['reviews_form'] = '{title_legend},name,headline,type,customTpl,reviews_jumpToError,jumpTo;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
-$GLOBALS['TL_DCA']['tl_module']['palettes']['reviews_sendlink'] = '{title_legend},name,headline,type,reviews_category,customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
-$GLOBALS['TL_DCA']['tl_module']['palettes']['reviews_list'] = '{title_legend},name,headline,type,reviews_category,perPage,customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
-$GLOBALS['TL_DCA']['tl_module']['palettes']['reviews_richsnippet'] = '{title_legend},name,type,reviews_category,customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
+use C4Y\Reviews\Controller\Module\BadgeModule;
+use C4Y\Reviews\Controller\Module\ReviewFormModule;
+use C4Y\Reviews\Controller\Module\ReviewListModule;
+use C4Y\Reviews\Controller\Module\ReviewRichSnippetModule;
+use C4Y\Reviews\Controller\Module\SendReviewLinkModule;
+
+$GLOBALS['TL_DCA']['tl_module']['palettes'][BadgeModule::TYPE] = '{title_legend},name,headline,type,reviews_category,reviews_list_header_description,jumpTo,reviews_badge_logo,reviews_badge_size,reviews_list_logo,reviews_list_size,reviews_badge_numberOfReviews,customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][ReviewFormModule::TYPE] = '{title_legend},name,headline,type,customTpl,reviews_jumpToError,jumpTo;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][SendReviewLinkModule::TYPE] = '{title_legend},name,headline,type,reviews_category,customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][ReviewListModule::TYPE] = '{title_legend},name,headline,type,reviews_category,perPage,customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][ReviewRichSnippetModule::TYPE] = '{title_legend},name,type,reviews_category,customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['reviews_category'] = [
     'exclude' => true,

@@ -8,38 +8,25 @@
  * @license MIT License
  */
 
-$GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE'] = array_merge_recursive(
-    (array) $GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE'],
-    [
-        'contao' => [
-            'reviews_link' => [
-                'recipients' => ['recipient_email'],
-                'email_subject' => ['link', 'user', 'recipient_email'],
-                'email_text' => ['link', 'user', 'recipient_email'],
-                'email_html' => ['link', 'user', 'recipient_email'],
-                'file_name' => ['link', 'user', 'recipient_email'],
-                'file_content' => ['link', 'user', 'recipient_email'],
-                'email_sender_name' => ['recipient_email'],
-                'email_sender_address' => ['recipient_email'],
-                'email_recipient_cc' => ['recipient_email'],
-                'email_recipient_bcc' => ['recipient_email'],
-                'email_replyTo' => ['recipient_email'],
-            ],
-        ],
-    ]
-);
 
-$GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE'] = array_merge_recursive(
-    (array) $GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE'],
-    [
-        'contao' => [
-            'reviews_admin' => [
-                'email_text' => ['link', 'user', 'rating', 'review', 'category'],
-                'email_html' => ['link', 'user', 'rating', 'review', 'category']
-            ],
-        ],
-    ]
-);
+$GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['contao']['reviews_link'] = [
+    'recipients' => ['recipient_email'],
+    'email_subject' => ['link', 'user', 'recipient_email'],
+    'email_text' => ['link', 'user', 'recipient_email'],
+    'email_html' => ['link', 'user', 'recipient_email'],
+    'file_name' => ['link', 'user', 'recipient_email'],
+    'file_content' => ['link', 'user', 'recipient_email'],
+    'email_sender_name' => ['recipient_email'],
+    'email_sender_address' => ['recipient_email'],
+    'email_recipient_cc' => ['recipient_email'],
+    'email_recipient_bcc' => ['recipient_email'],
+    'email_replyTo' => ['recipient_email'],
+];
+
+$GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['contao']['reviews_admin'] = [
+    'email_text' => ['link', 'user', 'rating', 'review', 'category'],
+    'email_html' => ['link', 'user', 'rating', 'review', 'category']
+];
 
 // Backend modules
 $GLOBALS['BE_MOD']['content']['c4y_reviews'] = [

@@ -10,6 +10,8 @@
 
 namespace C4Y\Reviews\Controller;
 
+use C4Y\Reviews\Models\CategoryModel;
+use C4Y\Reviews\Models\ReviewModel;
 use C4Y\Reviews\Services\ReviewService;
 use Contao\Input;
 use Doctrine\DBAL\Connection;
@@ -61,24 +63,17 @@ class ReviewController extends AbstractController
             return new JsonResponse('{"error": true, "msg": "No valid json"}');
         }
 
-        $statement = $this->connection->createQueryBuilder()
-            ->select('id, apiToken')
-            ->from('tl_c4y_reviews_category', 't')
-            ->where('t.id =:category')
-            ->setParameter('category', $data->category)
-            ->execute();
+        $apiToken = CategoryModel::findByPk($data->category)->apiToken;
 
-        $result = $statement->fetch(\PDO::FETCH_OBJ);
-
-        if (false === $result) {
+        if (empty($apiToken)) {
             return new JsonResponse(['error' => true, 'msg' => 'Category '.$data->category.' not found']);
         }
 
-        if ($data->apiToken !== $result->apiToken) {
+        if ($data->apiToken !== $apiToken) {
             return new JsonResponse(['error' => true, 'msg' => 'API-Token invalid']);
         }
 
-        $result = $this->reviewService->sendLink($data->user, $data->email,$data->category);
+        $result = $this->reviewService->sendLink($data->user, $data->email, $data->category);
 
         if (false === $result || false === $result['1']) {
             return new JsonResponse(['error' => true, 'msg' => 'E-Mail could not be send. Typo in email?']);
@@ -90,6 +85,8 @@ class ReviewController extends AbstractController
     /**
      * Publish a review with the API Token in the category
      * GET /api/reviews/publish/123?apiToken=12345
+     * Unfortunately we can't use PUT here, otherwise
+     * the link in the email won't work
      *
      * @Route("/api/reviews/publish/{id}", methods={"GET"}, name="publishReview")
      */
@@ -101,29 +98,15 @@ class ReviewController extends AbstractController
             return new Response('You need a valid API Token');
         }
 
-        $statement = $this->connection->createQueryBuilder()
-            ->select('r.id', 'c.apiToken')
-            ->from('tl_c4y_reviews_category', 'c')
-            ->leftJoin('c', 'tl_c4y_reviews', 'r', 'c.id=r.pid')
-            ->where('r.id = :id')
-            ->andWhere('c.apiToken = :apiToken')
-            ->setParameter('id', $id)
-            ->setParameter('apiToken', $apiToken)
-            ->execute();
+        $review = ReviewModel::findPublishedByIdAndToken($id, $apiToken);
 
-        $result = $statement->fetch(\PDO::FETCH_OBJ);
-
-        if (false === $result) {
+        if ($review == false) {
             return new Response('ID or API Key is invalid');
         }
 
-        $this->connection->createQueryBuilder()
-            ->update('tl_c4y_reviews', 'r')
-            ->set("published", "1")
-            ->where("id = :id")
-            ->setParameter("id", $id)
-            ->execute();
+        $review->published = "1";
+        $review->save();
 
-        return new Response('The Review with ID ' . $result->id . ' has been published');
+        return new Response('The Review with ID ' . $id . ' has been published');
     }
 }

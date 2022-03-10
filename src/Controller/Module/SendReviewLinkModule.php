@@ -18,9 +18,15 @@ use Contao\ModuleModel;
 use Contao\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 
+/**
+ * @FrontendModule(SendReviewLinkModule::TYPE, category="miscellaneous")
+ */
 class SendReviewLinkModule extends AbstractFrontendModuleController
 {
+    public const TYPE = 'reviews_sendlink';
+
     /**
      * @var FormFactory
      */
@@ -29,7 +35,7 @@ class SendReviewLinkModule extends AbstractFrontendModuleController
     /**
      * @var ReviewService
      */
-    private $reviewService;
+    protected $reviewService;
 
     /**
      * FormController constructor.

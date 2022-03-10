@@ -13,18 +13,6 @@
             "name": "xxx"
         },
         "sku": "xxx",
-        "review": {
-            "@type": "Review",
-            "reviewRating": {
-                "@type": "Rating",
-                "ratingValue": "<?= $this->rating; ?>",
-                "bestRating": "5"
-            },
-            "author": {
-                "@type": "Person",
-                "name": "<?= $this->user; ?>"
-            }
-        },
         "aggregateRating": {
             "@type": "AggregateRating",
             "ratingValue": "<?= $this->avgRating; ?>",

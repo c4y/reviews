@@ -10,43 +10,29 @@
 
 namespace C4Y\Reviews\Controller\Module;
 
+use C4Y\Reviews\Dto\Statistic;
+use C4Y\Reviews\Models\ReviewModel;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\ModuleModel;
 use Contao\Template;
-use Doctrine\DBAL\Connection;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 
+/**
+ * @FrontendModule(ReviewRichSnippetModule::TYPE, category="miscellaneous")
+ */
 class ReviewRichSnippetModule extends AbstractFrontendModuleController
 {
-    private $connection;
-    private $frontendTemplate;
-
-    public function __construct(Connection $connection)
-    {
-        $this->connection = $connection;
-    }
+    public const TYPE = 'reviews_richsnippet';
 
     protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
     {
-        $statement = $this->connection->createQueryBuilder()
-            ->select('*, AVG(t.rating) AS avgRating', 'COUNT(t.rating) AS numberOfReviews')
-            ->from('tl_c4y_reviews', 't')
-            ->where('t.published = "1"')
-            ->andWhere('t.pid =:category')
-            ->setMaxResults(1)
-            ->orderBy("review_date", "DESC")
-            ->setParameter('category', $model->reviews_category)
-            ->execute();
+        /* @var Statistic $statistic */
+        $statistic = ReviewModel::getStatistic($model->reviews_category);
 
-        $result = $statement->fetch(\PDO::FETCH_OBJ);
-
-        $template->numberOfReviews = $result->numberOfReviews;
-        $template->avgRating = sprintf('%.2f', $result->avgRating);
-        $template->user = $result->user;
-        $template->review = $result->review;
-        $template->review_date = $review_date;
-        $template->rating = $result->rating;
+        $template->numberOfReviews = $statistic->getNumberOfReviews();
+        $template->avgRating = sprintf('%.2f', $statistic->getRating());
 
         return $template->getResponse();
     }

@@ -1,0 +1,82 @@
+{% import "@ContaoCore/Image/Studio/_macros.html.twig" as studio %}
+
+<div class="reviews-badge{% if hideBadge %} closed{% endif %}">
+    <div class="close">X</div>
+    {{- studio.figure(badgeLogo) -}}
+    <div class="title"></div>
+    <div class="reviews--number-of-reviews">{{ statistic.getNumberOfReviews() }} {{ 'reviews.kundenbewertungen'|trans({}, 'contao_default') }}</div>
+    <div class="reviews--rating-stars">
+        <div class="reviews--rating-stars-full" style="width: {{ statistic.getRatingInPercent() }}%;">
+            <span>&#x2605;&#x2605;&#x2605;&#x2605;&#x2605;</span>
+        </div>
+    </div>
+    <div class="reviews--rating"><span>{{ statistic.getRating()|number_format(2, ".") }}</span> / 5.00</div>
+</div>
+
+<div class="reviews-list">
+    <div class="reviews-list--header row">
+        <div class="reviews-list--header-logo col-xs-3">
+            {{- studio.figure(listLogo) -}}
+        </div>
+        <div class="reviews-list--header-rating col-xs-7">
+            <div class="reviews-list--header-rating-description">
+                {{ reviews_list_header_description }}
+            </div>
+            <div class="reviews--rating"><span>{{ statistic.getRating()|number_format(2, ".") }}</span> / 5.00</div>
+            <div class="reviews--rating-stars">
+                <div class="reviews--rating-stars-full" style="width: {{ statistic.getRatingInPercent() }}%;">
+                    <span>&#x2605;&#x2605;&#x2605;&#x2605;&#x2605;</span>
+                </div>
+            </div>
+        </div>
+        <div class="reviews-list--header-close col-xs-2">
+            <button>x</button>
+        </div>
+    </div>
+    <div class="reviews-list--reviews">
+        {% for review in reviews %}
+        <div class="reviews-list--review-wrapper">
+            <p class="reviews-list--review-author">{{ review.user }}</p>
+            <p class="reviews-list--review-time">{{ review.review_date|date("d.m.Y") }}</p>
+            <p class="reviews-list--review">
+                {% for i in 1..5 %}
+                {% if review.rating >= i %}
+                <span class="reviews--star__full">&#x2605</span>
+                {%  else %}
+                <span class="reviews--star__empty">&#x2606</span>
+                {% endif %}
+                {% endfor %}
+                <span class="reviews-list--review__text">{{ review.review }}</span>
+            </p>
+            {% if review.comment is not empty %}
+            <p class="reviews-list--comment-header">{{ 'reviews.review_comment'|trans({}, 'contao_default') }}</p>
+            <p class="reviews-list--comment">
+                {{ review.comment }}
+            </p>
+            {%  endif %}
+        </div>
+        {% endfor %}
+    </div>
+    <div class="reviews-list--link-to-all-reviews">
+        <a href="{{ jumpTo }}">Alle Bewertungen ansehen.</a>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+        // Close Badge
+        document.querySelector(".reviews-badge .close").addEventListener('click', function(e){
+            e.stopPropagation();
+            document.querySelector(".reviews-badge").classList.add('closed');
+            document.cookie = "reviews_hide_badge=1; expires=0; path=/";
+        })
+        // Open List
+        document.querySelector(".reviews-badge").addEventListener('click', function(){
+            document.querySelector(".reviews-list").classList.add('active');
+        })
+        // Close List
+        document.querySelector(".reviews-list--header").addEventListener('click', function(){
+            document.querySelector(".reviews-list").classList.remove('active');
+        })
+    });
+</script>

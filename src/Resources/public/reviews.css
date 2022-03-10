@@ -2,13 +2,11 @@
  * General star stylings
  ******************************************/
 .reviews--rating-stars {
-    width:150px;
+    width:125px;
     position: relative;
     color: #F7A720;
     position: relative;
-    left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
+    margin: 0 auto;
 }
 
 /*

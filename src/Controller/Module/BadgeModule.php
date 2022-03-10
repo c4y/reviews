@@ -10,87 +10,54 @@
 
 namespace C4Y\Reviews\Controller\Module;
 
-use Contao\Controller;
+use C4Y\Reviews\Models\ReviewModel;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
-use Contao\CoreBundle\Image\PictureFactoryInterface;
-use Contao\FilesModel;
+use Contao\CoreBundle\Image\Studio\Studio;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\Template;
-use Doctrine\DBAL\Connection;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 
+/**
+ * @FrontendModule(BadgeModule::TYPE, category="miscellaneous")
+ */
 class BadgeModule extends AbstractFrontendModuleController
 {
-    private $connection;
-    private $picture;
-    private $frontendTemplate;
+    public const TYPE = 'reviews_badge';
 
-    public function __construct(Connection $connection, PictureFactoryInterface $picture)
+    protected $studio;
+
+    public function __construct(Studio $studio)
     {
-        $this->connection = $connection;
-        $this->picture = $picture;
+        $this->studio = $studio;
     }
 
     protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
     {
-        // Badge
-        $statement = $this->connection->createQueryBuilder()
-            ->select('AVG(t.rating) AS rating', 'COUNT(t.rating) AS numberOfReviews')
-            ->from('tl_c4y_reviews', 't')
-            ->where('t.published = "1"')
-            ->andWhere('t.pid =:category')
-            ->setParameter('category', $model->reviews_category)
-            ->execute();
+        $template->statistic = ReviewModel::getStatistic($model->reviews_category);
+        $template->hideBadge = (isset($_COOKIE['reviews_hide_badge']) && $_COOKIE['reviews_hide_badge'] == '1') ? true : false;
 
-        $result = $statement->fetch(\PDO::FETCH_OBJ);
+        $figureBuilder = $this->studio->createFigureBuilder();
 
-        $template->numberOfReviews = $result->numberOfReviews;
-        $template->rating = sprintf('%.2f', $result->rating);
-        $template->ratingPercentage = 100 * $result->rating / 5;
-        $template->hideBadge = ('1' === $_COOKIE['reviews_hide_badge']) ? true : false;
+        $template->badgeLogo = $figureBuilder
+            ->fromUuid($model->reviews_badge_logo)
+            ->setSize($model->reviews_badge_size)
+            ->build();
 
-        $badgeLogo = new \stdClass();
-        $badgeFile = FilesModel::findById($model->reviews_badge_logo);
-        $badgeConfig = [
-            'singleSRC' => $badgeFile->path,
-            'size' => $model->reviews_badge_size,
-        ];
-        Controller::addImageToTemplate($badgeLogo, $badgeConfig, null, null, $badgeFile);
-        $template->badgeLogo = $badgeLogo;
-        // if you want to use $this->insert('image', $this->badgeLogo); inside the template, you
-        // have to typecast the class
-        //$template->badgeLogo = (array) $badgeLogo;
+        $template->listLogo = $figureBuilder
+            ->fromUuid($model->reviews_list_logo)
+            ->setSize($model->reviews_list_size)
+            ->build();
 
-        // Reviews
-        $statement = $this->connection->createQueryBuilder()
-            ->select('t.*')
-            ->from('tl_c4y_reviews', 't')
-            ->where('t.published = "1"')
-            ->andWhere('t.pid =:category')
-            ->orderBy('review_date', 'DESC')
-            ->setMaxResults($model->reviews_badge_numberOfReviews)
-            ->setParameter('category', $model->reviews_category)
-            ->execute();
-
-        $reviews = $statement->fetchAll(\PDO::FETCH_CLASS);
-
-        foreach ($reviews as $review) {
-            $review->ratingPercentage = 100 * $review->rating / 5;
-        }
+        $arrOptions = array(
+            "limit"=>$model->reviews_badge_numberOfReviews,
+            "order" => 'review_date DESC'
+        );
+        $reviews = ReviewModel::findPublishedByPid($model->reviews_category, $arrOptions);
 
         $template->reviews = $reviews;
-        $template->list_logo = FilesModel::findById($model->reviews_list_logo)->path;
-
-        $listLogo = new \stdClass();
-        $listFile = FilesModel::findById($model->reviews_list_logo);
-        $listConfig = [
-            'singleSRC' => $listFile->path,
-            'size' => $model->reviews_list_size,
-        ];
-        Controller::addImageToTemplate($listLogo, $listConfig, null, null, $listFile);
-        $template->listLogo = $listLogo;
         $template->jumpTo = PageModel::findById($model->jumpTo)->getFrontendUrl();
 
         return $template->getResponse();

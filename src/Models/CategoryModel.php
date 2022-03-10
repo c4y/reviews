@@ -13,14 +13,16 @@ namespace C4Y\Reviews\Models;
 use Contao\Model;
 
 /**
- * Class TokenModel.
+ * Class CategoryModel.
  *
  * @property int id
  * @property int pid
  * @property int tstamp
  * @property string title
  * @property string url
- * @property id notification
+ * @property int notification
+ * @property int notification_admin
+ * @property string apiToken
  */
 class CategoryModel extends Model
 {

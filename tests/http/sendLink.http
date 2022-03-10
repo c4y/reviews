@@ -1,0 +1,9 @@
+POST http://contao413.test//api/reviews/sendlink
+Content-Type: application/json
+
+{
+   "user": "API User",
+   "email": "test@test.de",
+   "category": 3,
+   "apiToken": "f063f3f5-e97e-497c-a7a1-e3c91b1c63fd"
+}

@@ -43,10 +43,10 @@ class Hooks
      */
     public function removeExpiredToken()
     {
-        $statement = $this->connection->createQueryBuilder()
+        $this->connection->createQueryBuilder()
             ->delete('tl_c4y_reviews_token')
             ->where('expires < :tstamp')
             ->setParameter('tstamp', time())
-            ->execute();
+            ->executeQuery();
     }
 }

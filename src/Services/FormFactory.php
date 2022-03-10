@@ -14,7 +14,13 @@ use Haste\Form\Form;
 
 class FormFactory
 {
-    public function create($id, $method, $callback)
+    /**
+     * @param $id
+     * @param $method
+     * @param $callback
+     * @return Form
+     */
+    public function create($id, $method, $callback): Form
     {
         return new Form($id, $method, $callback);
     }

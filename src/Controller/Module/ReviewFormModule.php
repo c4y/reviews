@@ -10,23 +10,29 @@
 
 namespace C4Y\Reviews\Controller\Module;
 
+use C4Y\Reviews\Models\CategoryModel;
 use C4Y\Reviews\Models\ReviewModel;
 use C4Y\Reviews\Models\TokenModel;
 use C4Y\Reviews\Services\FormFactory;
 use C4Y\Reviews\Services\ReviewService;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
-use Contao\Email;
 use Contao\Input;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\Template;
-use Doctrine\DBAL\Connection;
+use Haste\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use NotificationCenter\Model\Notification;
+use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 
+/**
+ * @FrontendModule(ReviewFormModule::TYPE, category="miscellaneous")
+ */
 class ReviewFormModule extends AbstractFrontendModuleController
 {
+    public const TYPE = 'reviews_form';
+
     /**
      * @var FormFactory
      */
@@ -45,12 +51,7 @@ class ReviewFormModule extends AbstractFrontendModuleController
     /**
      * @var ReviewService
      */
-    private $reviewService;
-
-    /**
-     * @var Connection
-     */
-    private $connection;
+    protected $reviewService;
 
 
     /**
@@ -62,36 +63,49 @@ class ReviewFormModule extends AbstractFrontendModuleController
         FormFactory $formFactory,
         TokenModel $tokenModel,
         ReviewModel $reviewModel,
-        ReviewService $reviewService,
-        Connection $connection
+        ReviewService $reviewService
         ) {
         $this->formFactory = $formFactory;
         $this->tokenModel = $tokenModel;
         $this->reviewModel = $reviewModel;
         $this->reviewService = $reviewService;
-        $this->connection = $connection;
     }
 
     protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
     {
         $token = Input::get('token');
+        $tokenModel = $this->getTokenModel($token);
 
-        if (empty($token)) {
-            // redirect
+        if($tokenModel == false) {
             $url = PageModel::findById($model->reviews_jumpToError)->getFrontendUrl();
+            return $this->redirect($url);
+        }
+
+        $objForm = $this->getForm();
+
+        if ($objForm->validate()) {
+            $review = $this->saveReview($tokenModel);
+            $category = CategoryModel::findByPk($tokenModel->category);
+            $link = $this->getReviewLink($request, $review, $category);
+            $notificationToken = $this->getNotificationToken($link, $review, $category);
+            $this->sendNotification($category, $notificationToken);
+            $tokenModel->delete();
+
+            $url = PageModel::findById($model->jumpTo)->getFrontendUrl();
 
             return $this->redirect($url);
         }
 
-        $tokenModel = $this->tokenModel->findBy('token', $token);
+        $template->form = $objForm->generate();
 
-        if (null === $tokenModel || time() > $tokenModel->expires) {
-            // redirect
-            $url = PageModel::findById($model->reviews_jumpToError)->getFrontendUrl();
+        return $template->getResponse();
+    }
 
-            return $this->redirect($url);
-        }
-
+    /**
+     * @return Form
+     */
+    protected function getForm(): Form
+    {
         $objForm = $this->formFactory->create('reviews_form', 'POST', function ($objHaste) {
             return \Input::post('FORM_SUBMIT') === $objHaste->getFormId();
         });
@@ -116,64 +130,92 @@ class ReviewFormModule extends AbstractFrontendModuleController
             'inputType' => 'submit',
         ]);
 
-        if ($objForm->validate()) {
+        return $objForm;
+    }
 
-            // save review
-            $this->reviewModel->pid = $tokenModel->category;
-            $this->reviewModel->user = $tokenModel->user;
-            $this->reviewModel->tstamp = time();
-            $this->reviewModel->comment = '';
-            $this->reviewModel->review_date = time();
-            $this->reviewModel->comment_date = 0;
-            $this->reviewModel->published = '';
-            $savedReview = $this->reviewModel->save();
-
-            // delete token
-            $tokenModel->delete();
-
-            $statement = $this->connection->createQueryBuilder()
-                ->select("apiToken, title, notification_admin")
-                ->from("tl_c4y_reviews_category")
-                ->where("id = :id")
-                ->setParameter("id", $tokenModel->category)
-                ->execute();
-
-            $categoryResult = $statement->fetch(\PDO::FETCH_OBJ);
-
-            if (false === $result) {
-                return new JsonResponse(['error' => true, 'msg' => 'Token invalid or id not exists']);
-            }
-
-            // send notification to administrator
-            $link = sprintf('%s://%s/api/reviews/publish/%s?apiToken=%s',
-                $request->getScheme(),
-                $request->getHost(),
-                $savedReview->id,
-                $categoryResult->apiToken
-            );
-
-            $notificationTokens = [
-                'link' => $link,
-                'user' => $tokenModel->user,
-                'category' => $categoryResult->title,
-                'rating' => $_POST["rating"],
-                'review' => $_POST["review"]
-            ];
-
-            /** @var Notification $notification */
-            $notification = Notification::findByPk($categoryResult->notification_admin);
-            if (null !== $notification) {
-                $notification->send($notificationTokens);
-            }
-
-            // redirect
-            $url = PageModel::findById($model->jumpTo)->getFrontendUrl();
-
-            return $this->redirect($url);
+    /**
+     * @param $token
+     * @return TokenModel|bool
+     */
+    protected function getTokenModel($token)
+    {
+        if (empty($token)) {
+            return false;
         }
 
-        $template->form = $objForm->generate();
+        $tokenModel = $this->tokenModel->findOneBy('token', $token);
 
-        return $template->getResponse();
+        if (null === $tokenModel || time() > $tokenModel->expires) {
+            return false;
+        }
+
+        return $tokenModel;
+    }
+
+    /**
+     * @param TokenModel $tokenModel
+     * @return ReviewModel
+     */
+    protected function saveReview(TokenModel $tokenModel): ReviewModel
+    {
+        // save review
+        $this->reviewModel->pid = $tokenModel->category;
+        $this->reviewModel->user = $tokenModel->user;
+        $this->reviewModel->tstamp = time();
+        $this->reviewModel->comment = '';
+        $this->reviewModel->review_date = time();
+        $this->reviewModel->comment_date = 0;
+        $this->reviewModel->published = '';
+
+        return $this->reviewModel->save();
+    }
+
+    /**
+     * @param Request $request
+     * @param ReviewModel $reviewModel
+     * @param CategoryModel $categoryModel
+     * @return string
+     */
+    protected function getReviewLink(Request $request, ReviewModel $reviewModel, CategoryModel $categoryModel): string
+    {
+        $link = sprintf('%s://%s:%s/api/reviews/publish/%s?apiToken=%s',
+            $request->getScheme(),
+            $request->getHost(),
+            $request->getPort(),
+            $reviewModel->id,
+            $categoryModel->apiToken
+        );
+
+        return $link;
+    }
+
+    /**
+     * @param string $link
+     * @param ReviewModel $tokenModel
+     * @param CategoryModel $reviewCategoryModel
+     * @return array
+     */
+    protected function getNotificationToken(string $link, ReviewModel $tokenModel, CategoryModel $reviewCategoryModel): array
+    {
+        return [
+            'link' => $link,
+            'user' => $tokenModel->user,
+            'category' => $reviewCategoryModel->title,
+            'rating' => $_POST["rating"],
+            'review' => $_POST["review"]
+        ];
+    }
+
+    /**
+     * @param CategoryModel $category
+     * @param array $notificationToken
+     */
+    protected function sendNotification(CategoryModel $category, array $notificationToken)
+    {
+        /** @var Notification $notification */
+        $notification = Notification::findByPk($category->notification_admin);
+        if (null !== $notification) {
+            $notification->send($notificationToken);
+        }
     }
 }
