@@ -58,7 +58,7 @@ class BadgeModule extends AbstractFrontendModuleController
         $reviews = ReviewModel::findPublishedByPid($model->reviews_category, $arrOptions);
 
         $template->reviews = $reviews;
-        $template->jumpTo = PageModel::findById($model->jumpTo)->getFrontendUrl();
+        $template->jumpTo = PageModel::findById($model->jumpTo)->getAbsoluteUrl();
 
         return $template->getResponse();
     }

@@ -77,7 +77,7 @@ class ReviewFormModule extends AbstractFrontendModuleController
         $tokenModel = $this->getTokenModel($token);
 
         if($tokenModel == false) {
-            $url = PageModel::findById($model->reviews_jumpToError)->getFrontendUrl();
+            $url = PageModel::findById($model->reviews_jumpToError)->getAbsoluteUrl();
             return $this->redirect($url);
         }
 
@@ -91,7 +91,7 @@ class ReviewFormModule extends AbstractFrontendModuleController
             $this->sendNotification($category, $notificationToken);
             $tokenModel->delete();
 
-            $url = PageModel::findById($model->jumpTo)->getFrontendUrl();
+            $url = PageModel::findById($model->jumpTo)->getAbsoluteUrl();
 
             return $this->redirect($url);
         }
