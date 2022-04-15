@@ -96,7 +96,7 @@ class ReviewModel extends Model
     {
         $t = static::$strTable;
 
-        $sql = "SELECT AVG(rating) AS rating, COUNT(rating) AS numberOfReviews FROM $t
+        $sql = "SELECT COALESCE(AVG(rating), 0) AS rating, COUNT(rating) AS numberOfReviews FROM $t
                     WHERE published=1 AND pid=?";
         $objStatement = Database::getInstance()->prepare($sql);
         $objResult = $objStatement->execute($pid);
