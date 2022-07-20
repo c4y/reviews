@@ -28,7 +28,11 @@ class ReviewListModule extends AbstractFrontendModuleController
 
     protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
     {
-        $total = ReviewModel::countPublishedByPid($model->reviews_category);
+        if($model->numberOfItems == 0) {
+            $total = ReviewModel::countPublishedByPid($model->reviews_category);
+        } else {
+            $total = $model->numberOfItems;
+        }
 
         $objPagination = new Pagination($total, $model->perPage, 'page_rp'.$model->id);
 

@@ -119,6 +119,12 @@ class ReviewFormModule extends AbstractFrontendModuleController
             'eval' => ['mandatory' => true],
         ]);
 
+        $objForm->addFormField('headline', [
+            'label' => $GLOBALS['TL_LANG']['reviews']['form_review_headline'][0],
+            'inputType' => 'text',
+            'eval' => ['mandatory' => false, 'maxlength' => 128],
+        ]);
+
         $objForm->addFormField('review', [
             'label' => $GLOBALS['TL_LANG']['reviews']['form_review_review'][0],
             'inputType' => 'textarea',

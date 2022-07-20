@@ -31,8 +31,8 @@ $GLOBALS['TL_DCA']['tl_c4y_reviews'] = [
             'panelLayout' => 'filter;search',
         ],
         'label' => [
-            'fields' => ['user', 'rating', 'review'],
-            'format' => '%s, (Rating: %s), Bewertung: %s',
+            'fields' => ['user', 'rating', 'headline', 'review'],
+            'format' => '%s, (Rating: %s), Bewertung: %s - %s',
         ],
         'operations' => [
             'edit' => [
@@ -58,7 +58,7 @@ $GLOBALS['TL_DCA']['tl_c4y_reviews'] = [
 
     // Palettes
     'palettes' => [
-        'default' => '{review_legend},user,rating,review,review_date,comment',
+        'default' => '{review_legend},user,rating,headline,review,review_date,comment',
     ],
 
     // Fields
@@ -89,12 +89,20 @@ $GLOBALS['TL_DCA']['tl_c4y_reviews'] = [
             'eval' => ['mandatory' => true, 'decodeEntities' => true, 'maxlength' => 1, 'tl_class' => 'w50'],
             'sql' => "varchar(1) NOT NULL default ''",
         ],
+        'headline' => [
+            'exclude' => true,
+            'inputType' => 'text',
+            'default' => '',
+            'search' => true,
+            'eval' => ['mandatory' => false, 'decodeEntities' => true, 'maxlength' => 128, 'tl_class' => 'w50'],
+            'sql' => "varchar(128) NOT NULL default ''",
+        ],
         'review' => [
             'exclude' => true,
             'inputType' => 'textarea',
             'default' => '',
             'search' => true,
-            'eval' => ['mandatory' => true, 'decodeEntities' => true, 'maxlength' => 1000, 'tl_class' => 'w50'],
+            'eval' => ['mandatory' => true, 'decodeEntities' => true, 'maxlength' => 1000, 'tl_class' => 'clr'],
             'sql' => "mediumtext NOT NULL default ''",
         ],
         'review_date' => [
