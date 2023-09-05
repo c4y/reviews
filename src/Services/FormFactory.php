@@ -10,7 +10,7 @@
 
 namespace C4Y\Reviews\Services;
 
-use Haste\Form\Form;
+use Codefog\HasteBundle\Form\Form;
 
 class FormFactory
 {

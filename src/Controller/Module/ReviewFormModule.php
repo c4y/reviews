@@ -20,7 +20,7 @@ use Contao\Input;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\Template;
-use Haste\Form\Form;
+use Codefog\HasteBundle\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use NotificationCenter\Model\Notification;
@@ -110,7 +110,7 @@ class ReviewFormModule extends AbstractFrontendModuleController
             return \Input::post('FORM_SUBMIT') === $objHaste->getFormId();
         });
 
-        $objForm->bindModel($this->reviewModel);
+        $objForm->setBoundModel($this->reviewModel);
 
         $objForm->addFormField('rating', [
             'label' => $GLOBALS['TL_LANG']['reviews']['form_review_rating'][0],

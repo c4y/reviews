@@ -13,7 +13,7 @@
     "require": {
         "php": "^7.4 || ^8.0",
         "contao/core-bundle": "^4.13",
-        "codefog/contao-haste": "^4.23",
+        "codefog/contao-haste": "^5.0",
         "terminal42/notification_center": "^1.5",
         "ext-json": "*"
     },
